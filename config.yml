@@ -1,0 +1,8 @@
+# Configuration File for My_IDS
+
+whitelisted_ips:
+  - 127.0.0.1
+  - 90.24.110.93
+
+# [Default] = "You will be banned and report in 5 seconds."
+message: "You will be banned, sorry :c"

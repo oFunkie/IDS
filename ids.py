@@ -7,6 +7,9 @@ import re
 from datetime import datetime
 import pytz
 import requests
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 #STATUS
 plus = f'[+]'
@@ -23,6 +26,34 @@ def load_config():
     except FileNotFoundError:
         print(f'{err} Configuration file (config.yml) not found.')
         return None
+
+def sendMail(ip, nbr):
+    smtp_server = 'smtp.gmail.com'
+    smtp_port = 587
+    smtp_username = 'a.barbarant02@gmail.com'
+    smtp_password = 'lalc enss cyoi vweq'
+
+    sender_email = 'a.barbarant02@gmail.com'
+    receiver_email = 'aurelienbarbarant@gmail.com'
+
+    subject = 'SCAN NMAP'
+    body = f'Scan Nmap de l\'ip: {ip}, {nbr} fois. '
+
+    message = MIMEMultipart()
+    message['From'] = sender_email
+    message['To'] = receiver_email
+    message['Subject'] = subject
+    message.attach(MIMEText(body, 'plain'))
+
+# Connexion au serveur SMTP
+    with smtplib.SMTP(smtp_server, smtp_port) as server:
+        server.starttls()
+        server.login(smtp_username, smtp_password)
+
+    # Envoi de l'e-mail
+        server.sendmail(sender_email, receiver_email, message.as_string())
+
+        print('E-mail envoyé avec succès.')
 
 def getIPINFO(ip):
     URL = "https://ipinfo.io/" + ip

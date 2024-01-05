@@ -10,6 +10,10 @@ import requests
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import socket
+from dotenv import load_dotenv
+
+load_dotenv()
 
 #STATUS
 plus = f'[+]'
@@ -27,17 +31,16 @@ def load_config():
         print(f'{err} Configuration file (config.yml) not found.')
         return None
 
-def sendMail(ip, nbr):
+def sendMail(sub, body):
     smtp_server = 'smtp.gmail.com'
     smtp_port = 587
-    smtp_username = 'a.barbarant02@gmail.com'
-    smtp_password = 'lalc enss cyoi vweq'
+    smtp_username = os.getenv("SMTP_USERNAME")
+    smtp_password = os.getenv("SMTP_PASSWORD")
+    sender_email = os.getenv("SENDER_EMAIL")
+    receiver_email = os.getenv("RECEIVER_EMAIL")
 
-    sender_email = 'a.barbarant02@gmail.com'
-    receiver_email = 'aurelienbarbarant@gmail.com'
-
-    subject = 'SCAN NMAP'
-    body = f'Scan Nmap de l\'ip: {ip}, {nbr} fois. '
+    subject = f'{sub}'
+    body = f'{body}'
 
     message = MIMEMultipart()
     message['From'] = sender_email
@@ -45,15 +48,18 @@ def sendMail(ip, nbr):
     message['Subject'] = subject
     message.attach(MIMEText(body, 'plain'))
 
-# Connexion au serveur SMTP
     with smtplib.SMTP(smtp_server, smtp_port) as server:
         server.starttls()
         server.login(smtp_username, smtp_password)
 
-    # Envoi de l'e-mail
         server.sendmail(sender_email, receiver_email, message.as_string())
 
         print('E-mail envoyé avec succès.')
+
+def whatTime():
+    paris_timezone = pytz.timezone('Europe/Paris')
+    heure_paris = datetime.now(paris_timezone).strftime('%H:%M:%S')
+    return heure_paris
 
 def getIPINFO(ip):
     URL = "https://ipinfo.io/" + ip
@@ -94,10 +100,20 @@ def getOut(config):
             if ip_match and ip_match.group() in whitelisted_ips:
                 print(f'{info} Whitelisted IP {ip_match.group()} connected. Ignoring.')
                 continue
+            
+            location = getIPINFO(ip_match.group())
+            heure_paris = whatTime()
+            
+            try:
+                subject_intrusion = f"INTRUSION ON {socket.gethostname()}"
+                body_intrusion = f"User {user_match.group()} connected to {socket.gethostname()} from ip: {ip_match.group()} at {heure_paris} in {location}"
+                sendMail(subject_intrusion, body_intrusion)
+            except Exception as MAIL_ERR:
+                print(f'{err} {MAIL_ERR}')
+                continue
 
             print(f'{plus} SSH user {user_match.group()} from {ip_match.group()}, pseudo-terminal slave: {pts_match.group()}')
 
-            location = getIPINFO(ip_match.group())
             info_log = f"{warn} UNKNOW USER {user_match.group()}:{ip_match.group()} connected from {location}"
             print(f"{info} Sending message: \"{message}\" to user {user_match.group()}")
             print(info_log)
@@ -134,10 +150,9 @@ def getOut(config):
 
 def log(loged_line):
     path_log = "sauron.txt"
-    paris_timezone = pytz.timezone('Europe/Paris')
-    heure_paris = datetime.now(paris_timezone).strftime('%H:%M:%S')
+    heure_paris_log = whatTime()
     with open(path_log, 'a') as log:
-        log.write(f"\n{heure_paris} {loged_line}")
+        log.write(f"\n{heure_paris_log} {loged_line}")
 
 if __name__ == "__main__":
     config = load_config()

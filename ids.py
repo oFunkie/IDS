@@ -54,7 +54,7 @@ def sendMail(sub, body):
 
         server.sendmail(sender_email, receiver_email, message.as_string())
 
-        print('E-mail envoyé avec succès.')
+        print(f'{plus} Email was send ')
 
 def whatTime():
     paris_timezone = pytz.timezone('Europe/Paris')

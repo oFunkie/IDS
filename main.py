@@ -12,6 +12,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import socket
 from dotenv import load_dotenv
+import time
 
 load_dotenv()
 
@@ -155,8 +156,7 @@ def log(loged_line):
         log.write(f"\n{heure_paris_log} {loged_line}")
 
 if __name__ == "__main__":
-    config = load_config()
-    getOut(config)
-
-
-
+    while True:
+        config = load_config()
+        getOut(config)
+        time.sleep(60)

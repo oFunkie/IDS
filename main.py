@@ -71,7 +71,7 @@ def getIPINFO(ip):
     city = str(res[6]);city = city.replace('\"', "");city = city.replace(',', "")
     loc = str(res[12]);loc = loc.replace("\"", "");loc = loc[:len(loc)-1]
     reg = str(res[8]);reg = reg.replace("\"", "");country = str(res[10]);country = country.replace("\"", "")
-    location = f"Location: {country} {reg} {city} at {loc}\n"
+    location = f"Location: {country} {reg} {city} at {loc}"
     return location
 
 def ban(ip):
@@ -101,10 +101,10 @@ def getOut(config):
             if ip_match and ip_match.group() in whitelisted_ips:
                 print(f'{info} Whitelisted IP {ip_match.group()} connected. Ignoring.')
                 continue
-            
+
             location = getIPINFO(ip_match.group())
             heure_paris = whatTime()
-            
+
             try:
                 subject_intrusion = f"INTRUSION ON {socket.gethostname()}"
                 body_intrusion = f"User {user_match.group()} connected to {socket.gethostname()} from ip: {ip_match.group()} at {heure_paris} in {location}"
@@ -150,7 +150,7 @@ def getOut(config):
             continue
 
 def log(loged_line):
-    path_log = "sauron.txt"
+    path_log = "intrusion.log"
     heure_paris_log = whatTime()
     with open(path_log, 'a') as log:
         log.write(f"\n{heure_paris_log} {loged_line}")

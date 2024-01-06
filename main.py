@@ -18,7 +18,7 @@ load_dotenv()
 #STATUS
 plus = f'[+]'
 info = f'[*]'
-min = f'[-]'
+mini = f'[-]'
 warn = f'[!]'
 err = f'[ERR]'
 
@@ -157,3 +157,6 @@ def log(loged_line):
 if __name__ == "__main__":
     config = load_config()
     getOut(config)
+
+
+
